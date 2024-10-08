@@ -4,12 +4,11 @@ import numpy as np
 import statsmodels.api as sm
 import plotly.express as px
 
-secs = ["Análise de séries", "Melhores da década"]
-tickers = secs
-ticker = st.sidebar.selectbox("Seções", tickers)
-if ticker == "Análise de séries":
-    eps_rating = pl.read_csv(
-        "C:\\Users\\Usuário\\Downloads\\imdb\\diretores_ep.csv",
+@st.cache_data
+def load_eps_rating():
+    url = "https://raw.githubusercontent.com/abibernardo/imdb_data/refs/heads/main/diretores_ep.csv"
+    return pl.read_csv(
+        url,
         null_values=["\\N"],
         dtypes={
             "rating_ep": pl.Float64,
@@ -19,8 +18,11 @@ if ticker == "Análise de séries":
         }
     )
 
-    periodo_serie = pl.read_csv(
-        "C:\\Users\\Usuário\\Downloads\\imdb\\inicio_termino_imdb.csv",
+@st.cache_data
+def load_periodo_serie():
+    url = "https://raw.githubusercontent.com/abibernardo/imdb_data/refs/heads/main/inicio_termino_imdb.csv"
+    return pl.read_csv(
+        url,
         null_values=["\\N"],
         dtypes={
             "startYear": pl.Utf8,
@@ -28,6 +30,58 @@ if ticker == "Análise de séries":
             "originalTitle": pl.Utf8
         }
     )
+
+@st.cache_data
+def load_dados_temporadas():
+    url = "https://raw.githubusercontent.com/abibernardo/imdb_data/refs/heads/main/dados_por_temporada_anual_imdb.csv"
+    return pl.read_csv(
+        url,
+        null_values=["\\N"],
+        dtypes={
+            "ano_temporada": pl.Int32,
+            "total_votos_temporada": pl.Int32,
+            "media_nota_temporada": pl.Float64
+        }
+    )
+
+@st.cache_data
+def load_dados_eps_ano():
+    url = "https://raw.githubusercontent.com/abibernardo/imdb_data/refs/heads/main/nota_pop_eps_imdb.csv"
+    return pl.read_csv(
+        url,
+        null_values=["\\N"],
+        dtypes={
+            "ano_ep": pl.Int32,
+            "votos_ep": pl.Int32,
+            "rating_ep": pl.Float64
+        }
+    )
+
+@st.cache_data
+def load_pop_series():
+    url = "https://raw.githubusercontent.com/abibernardo/imdb_data/refs/heads/main/inicio_termino_imdb.csv"
+    return pl.read_csv(
+        url,
+        null_values=["\\N"],
+        dtypes={
+            "startYear": pl.Int32,
+            "endYear": pl.Int32,
+            "numVotes": pl.Int32,
+            "averageRating": pl.Float64
+        }
+    )
+# Carregue os dados
+eps_rating = load_eps_rating()
+periodo_serie = load_periodo_serie()
+dados_temporadas = load_dados_temporadas()
+dados_eps_ano = load_dados_eps_ano()
+pop_series = load_pop_series()
+
+
+secs = ["Análise de séries", "Melhores da década"]
+tickers = secs
+ticker = st.sidebar.selectbox("Seções", tickers)
+if ticker == "Análise de séries":
 
     # Título da aplicação
     st.title("ME315: Análise de dados do IMDB")
@@ -105,16 +159,6 @@ if ticker == "Análise de séries":
     st.divider()
     st.write(" ")
 else:
-    pop_series = pl.read_csv(
-        "C:\\Users\\Usuário\\Downloads\\imdb\\inicio_termino_imdb.csv",
-        null_values=["\\N"],
-        dtypes={
-            "startYear": pl.Int32,
-            "endYear": pl.Int32,
-            "numVotes": pl.Int32,
-            "averageRating": pl.Float64
-        }
-    )
 
     st.title("Quais foram as séries mais populares de cada década?")
     decada = st.radio(
@@ -147,16 +191,6 @@ else:
     ]).limit(15)
     st.dataframe(popularidade, use_container_width=True)
     st.divider()
-    dados_temporadas = pl.read_csv(
-        "C:\\Users\\Usuário\\Downloads\\imdb\\dados_por_temporada_anual_imdb.csv",
-        null_values=["\\N"],
-        dtypes={
-            "ano_temporada": pl.Int32,
-            "total_votos_temporada": pl.Int32,
-            "media_nota_temporada": pl.Float64
-        }
-    )
-
     st.title("Quais foram as temporadas mais populares de cada década?")
     decada = st.radio(
         "Quer ver o top 30 de qual década?",
@@ -191,15 +225,6 @@ else:
     st.dataframe(popularidade_70, use_container_width=True)
     st.divider()
     st.title("Quais foram os episódios mais populares de cada década?")
-    dados_eps_ano = pl.read_csv(
-        "C:\\Users\\Usuário\\Downloads\\imdb\\nota_pop_eps_imdb.csv",
-        null_values=["\\N"],
-        dtypes={
-            "ano_ep": pl.Int32,
-            "votos_ep": pl.Int32,
-            "rating_ep": pl.Float64
-        }
-    )
     decada = st.radio(
         "Quer ver o top 30 de qual década?",
         ["anos 70", "anos 80", "anos 90", "anos 2000", "anos 2010", "todos os tempos"], key='3')
