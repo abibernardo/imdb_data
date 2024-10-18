@@ -91,7 +91,21 @@ if ticker == "Análise de séries":
 
     if show:
         try:
-            st.title(show)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.title(show)
+            if show in ["Hacks", "The Marvelous Mrs. Maisel", "The Bear", "Ted Lasso", "Veep", "Schitt's Creek", "The White Lotus","Fleabag", "Modern Family", "30 Rock", "Everybody Loves Raymond", "Friends", "Arrested Development", "Sex and the City", "Succession", "The Crown", "Game of Thrones", "The Handmaid’s Tale", "Breaking Bad", "Homeland", "Mad Men", "The Sopranos", "Lost"]:
+                with col2:
+                    st.image(
+                    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRHY7JoOc1OQ7ouCNPAozO8_jN_cJ98zQBt0Q&s",
+                    width=50
+                )
+            elif show in ["Twin Peaks"]:
+                st.image(
+                    "https://www.vishows.com.br/wp-content/uploads/2017/05/welcome-to-twin-peaks-1200x628-facebook.jpg",
+                    width=300
+                )
+
             serie = periodo_serie.filter(pl.col('originalTitle') == show)
             ano_inicio = serie['startYear'][0]
             ano_fim = serie['endYear'][0]
